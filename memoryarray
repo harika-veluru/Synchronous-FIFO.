@@ -1,0 +1,31 @@
+module memory_array(data_out, data_in, clk,fifo_we, wptr,rptr);
+input[7:0] data_in;
+input clk,fifo_we;
+input[4:0] wptr,rptr;
+output[7:0] data_out;
+reg[7:0] data_out2[15:0];
+wire[7:0] data_out;
+always @(posedge clk)
+begin
+if(fifo_we)
+data_out2[wptr[3:0]] <=data_in ;
+end
+assign data_out = data_out2[rptr[3:0]];
+endmodule
+// Verilog code for Read Pointer sub-module
+`timescale 1 ns/100 ps
+module read_pointer(rptr,fifo_rd,rd,fifo_empty,clk,rst_n);
+input rd,fifo_empty,clk,rst_n;
+output[4:0] rptr;
+output fifo_rd;
+reg[4:0] rptr;
+assign fifo_rd = (~fifo_empty)& rd;
+always @(posedge clk or negedge rst_n)
+begin
+if(~rst_n) rptr <= 5'b00000;
+else if(fifo_rd)
+rptr <= rptr + 5'b00001;
+else
+rptr <= rptr;
+end
+endmodule
